@@ -1,0 +1,153 @@
+---
+include:
+  - docassemble.AssemblyLine:al_package.yml
+  # - docassemble.ALAnyState:any_state.yml
+  - docassemble.AKA2JBranding:custom_organization.yml
+---
+metadata:
+  title: |
+    Changing Child Support - interim v final order
+  short title: |
+    Changing Child Support
+---
+modules:
+  - docassemble.ALToolbox.misc
+---
+features:
+  css: docassemble.ALToolbox:collapse_template.css
+---
+mandatory: true
+code: |
+  if middle_of_case == "yes":
+    if interim_order_date_unknown == "unknown":
+      if stop_or_continue_for_date == 'stop':
+        confirmation
+  
+  else:
+    reason_for_change
+    if unknown_date == 'unknown':
+      if stop_or_continue_for_date == 'stop':
+        confirmation
+---
+id: Interim or final order
+question: |
+  Are you in the middle of the court case now? 
+fields:
+  - no label: middle_of_case
+    input type: radio
+    choices:
+      - "Yes. The judge issued an 'interim' child support order.": yes
+      - "No. The case is finished. The judge issued a final child support order.": no 
+---
+id: Date of interim order
+question: |
+  What is the date on your interim child support order?
+fields:
+  - date: interim_support_order_date
+    datatype: date
+    hide if:
+      unknown_interim_date
+  - "I do not know the exact date": unknown_interim_date
+    datatype: yesno
+  - no label: interim_order_date_unknown
+    input type: radio
+    choices:
+    - "But it was in the last 10 days.": within 10
+    - "But it was more than 10 days ago.": more than 10
+    - "I do not know if the date was in the last 10 days.": unknown
+    show if:
+      unknown_interim_date
+  - note: |
+      Look at the box at the bottom of the order. You can see the date the order was "distributed" to you.
+    show if:
+      unknown_interim_date
+---
+id: reason for changing order
+question: |
+  Why do you need to change your child support order?
+fields:
+  - no label: reason_for_change
+    input type: radio
+    choices:
+      - 'There’s a problem with the order.': problem
+        help: |
+          For example:
+
+          * The judge made a mistake.
+          * The other parent lied. 
+          * You found new evidence you could not have found before the judge made the order.
+      - 'The situation changed.': situation
+        help: |
+          For example:
+
+          * Your income or the other parent’s income or financial situation changed.
+          * Your child’s schedule of nights they spend with each parent changed.
+          * The monthly premium for your child’s health insurance changed.
+          *	You or the other parent can get health insurance at a reasonable cost now, but you could not get it before.
+---  
+id: date on final order
+Question: |
+  What is the date on your child support order?
+fields:
+  - date: support_order_date
+    datatype: date
+    hide if:
+      unknown_date
+  - "I do not know the exact date": unknown_date
+    datatype: yesno
+  - no label: order_date_unknown
+    input type: radio
+    choices:
+    - "But it was in the last 10 days.": within 10
+    - "It was more than 10 days ago, but within the last 30.": within 30
+    - "And I do not know if the order is older than 30 days.": unknown
+    show if:
+      unknown_date
+  - note: |
+      Look at the box at the bottom of the order. You can see the date the order was "distributed" to you.
+    show if:
+      unknown_date
+---
+id: stop or continue to look for issuer
+question: |
+  What do you want to do?
+subquestion: |
+  If the court issued your child support order you can...
+  If CSSD issued your child support you can
+fields:  
+  - 'I want to': stop_or_continue_for_issuer
+    input type: radio
+    choices:
+      - "Stop and figure out who ordered my child support order.": stop
+      - "Keep answering questions and learn about": continue
+  - no label: find_issuer
+    datatype: checkboxes
+    choices: 
+      - "Asking CSSD to change my child support order.": cssd
+      - "Asking the court to change my child support order.": court
+    js show if:
+      val(stop_or_continue_for_issuer) === 'continue'
+---
+id: stop or continue to look for date
+question: |
+  What do you want to do?
+subquestion: |
+  The "distribution date" on the order you have now decides the kind of motion you use to ask the judge to change your child support order. (image of distribution date on order) 
+fields: 
+  - 'I want to': stop_or_continue_for_date
+    input type: radio
+    choices:
+      - "Stop and find the date.": stop
+      - "Keep answering questions and learn about the different motions I can file.": continue
+---
+id: final page
+event: confirmation
+question: |
+  Your Personal Action Plan is ready!
+subquestion: |
+  Conditional text including HTML PAP
+  Also links to:
+  
+  * Download PAP for printing saving etc
+  * Download bundle of forms user needs if they need forms
+---
